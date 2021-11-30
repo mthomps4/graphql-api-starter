@@ -6,10 +6,8 @@ import {
   stringArg,
   arg,
   nonNull,
-  enumType,
   list,
 } from 'nexus';
-import { Role } from '@prisma/client';
 import { UserInputError } from 'apollo-server-micro';
 
 import { hashPassword, appJwtForUser, comparePasswords } from '../../services/auth';
@@ -23,7 +21,12 @@ export const User = objectType({
     t.nonNull.id('id');
     t.nonNull.date('createdAt');
     t.nonNull.date('updatedAt');
-    t.nonNull.list.nonNull.field('roles', { type: 'Role' });
+    t.nonNull.list.nonNull.field('roles', {
+      type: 'UserRole',
+      resolve: (parent, _, context) => {
+        return context.prisma.user.findUnique({ where: { id: parent.id } }).roles();
+      },
+    });
 
     // Show email as null for unauthorized users
     t.string('email', {
@@ -64,7 +67,7 @@ export const meQuery = queryField('me', {
 
 export const findUsersQuery = queryField('users', {
   type: list('User'),
-  authorize: (_root, _args, ctx) => isAdmin(ctx.user),
+  authorize: (_root, _args, ctx) => isAdmin(ctx.user, ctx),
   resolve: async (_root, args, ctx) => {
     return await ctx.db.user.findMany({ ...args });
   },
@@ -135,7 +138,7 @@ export const signupMutation = mutationField('signup', {
     const updatedArgs = {
       data: {
         ...data,
-        roles: { set: [Role.USER] },
+        roles: { connect: [{ name: 'USER' }] },
         password: hashPassword(data.password),
       },
     };
@@ -156,7 +159,7 @@ export const createUserMutation = mutationField('createUser', {
   args: {
     data: nonNull(arg({ type: 'UserCreateInput' })),
   },
-  authorize: (_root, _args, ctx) => isAdmin(ctx.user),
+  authorize: (_root, _args, ctx) => isAdmin(ctx.user, ctx),
   resolve: async (_root, args, ctx) => {
     const { data } = args;
     const existingUser = await ctx.db.user.findUnique({ where: { email: data.email } });
@@ -171,6 +174,7 @@ export const createUserMutation = mutationField('createUser', {
     const updatedArgs = {
       data: {
         ...data,
+        roles: { connect: [{ name: 'USER' }] },
         password: hashPassword(data.password),
       },
     };
@@ -213,12 +217,6 @@ export const SignupInput = inputObjectType({
   },
 });
 
-// Manually added types that were previously in the prisma plugin
-export const UserRole = enumType({
-  name: 'Role',
-  members: Object.values(Role),
-});
-
 export const UserOrderByInput = inputObjectType({
   name: 'UserOrderByInput',
   description: 'Order users by a specific field',
@@ -254,10 +252,11 @@ export const UserCreateInput = inputObjectType({
     t.nonNull.string('email');
     t.nonNull.string('password');
     t.field('roles', {
-      type: list('Role'),
+      type: 'RoleRelationalCreateInput',
     });
+
     t.field('profile', {
-      type: 'ProfileRelationalCreateInput'
-    })
+      type: 'ProfileRelationalCreateInput',
+    });
   },
 });

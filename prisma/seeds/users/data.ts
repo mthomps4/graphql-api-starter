@@ -1,5 +1,5 @@
 import { hashPassword } from '../../../services/auth';
-import { Role, UserCreateInput } from '../../../types';
+import { UserCreateInput } from '../../../types';
 
 // *********************************************
 // ** DEVELOPMENT DATA SET
@@ -11,7 +11,7 @@ const initialDevUsers: UserCreateInput[] = [
   {
     email: 'barry.allen@speedforce.net',
     password: hashPassword(INITIAL_PASSWORD),
-    roles: [Role.ADMIN],
+    roles: { connect: [{ name: 'ADMIN' }] },
     profile: {
       create: {
         firstName: 'Barry',
@@ -31,7 +31,7 @@ const initialProdUsers: UserCreateInput[] = [
   {
     email: 'apps@echobind.com',
     password: hashPassword(INITIAL_PROD_PASSWORD),
-    roles: [Role.ADMIN],
+    roles: { connect: [{ name: 'ADMIN' }] },
     profile: {
       create: {
         firstName: 'EB',

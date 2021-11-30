@@ -1,4 +1,3 @@
-import { Role } from '@prisma/client';
 import Chance from 'chance';
 import { GraphQLError } from 'graphql';
 
@@ -63,7 +62,7 @@ describe('User signup mutation', () => {
           email: 'hello@wee.net',
           password: 'fake',
           profile: { create: { firstName: chance.first(), lastName: chance.last() } },
-          roles: { set: [Role.ADMIN] },
+          roles: { connect: { name: 'ADMIN' } },
         },
       };
 

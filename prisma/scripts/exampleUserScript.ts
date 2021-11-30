@@ -1,5 +1,5 @@
 import { hashPassword } from '../../services/auth';
-import { Role, UserCreateInput } from '../../types';
+import { UserCreateInput } from '../../types';
 
 import { seedUsers } from '../seeds/users';
 
@@ -18,7 +18,7 @@ const main = async () => {
       },
       email: 'cisco.ramon@speedforce.net',
       password: hashPassword(INITIAL_PASSWORD),
-      roles: [Role.ADMIN],
+      roles: { connect: [{ name: 'ADMIN' }] },
     },
     {
       profile: {
@@ -29,7 +29,7 @@ const main = async () => {
       },
       email: 'caitlin.snow@speedforce.net',
       password: hashPassword(INITIAL_PASSWORD),
-      roles: [Role.ADMIN],
+      roles: { connect: [{ name: 'ADMIN' }] },
     },
     {
       profile: {
@@ -40,7 +40,7 @@ const main = async () => {
       },
       email: 'harrison.wells@speedforce.net',
       password: hashPassword(INITIAL_PASSWORD),
-      roles: [Role.ADMIN],
+      roles: { connect: [{ name: 'ADMIN' }] },
     },
   ];
 

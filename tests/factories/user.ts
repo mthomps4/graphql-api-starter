@@ -1,5 +1,5 @@
 import Chance from 'chance';
-import { Role, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 import { buildPrismaIncludeFromAttrs } from '../helpers/buildPrismaIncludeFromAttrs';
 import { prisma } from '../../lib/prisma';
@@ -12,7 +12,7 @@ export const UserFactory = {
     return {
       email: chance.email(),
       password: 'test1234',
-      roles: { set: [Role.USER] },
+      roles: { connect: [{ name: 'USER' }] },
       ...attrs,
     };
   },
@@ -24,7 +24,7 @@ export const UserFactory = {
     if (includes) options.include = includes;
 
     return await prisma.user.create({
-      data: { ...user, password: hashPassword(user.password), roles: user.roles },
+      data: { ...user, password: hashPassword(user.password) },
       ...options,
     });
   },

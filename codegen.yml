@@ -6,13 +6,7 @@ hooks:
     - yarn lint
 generates:
   types.ts:
-    documents:
-      - 'pages/**/*.{ts,tsx}'
-      - 'components/**/*.{ts,tsx}'
-      - 'cells/**/*.{ts,tsx}'
-      - 'layouts/**/*.{ts,tsx}'
-      - 'context/**/*.{ts,tsx}'
-      - '!pages/api*'
+    # documents:
     plugins:
       - typescript
       - typescript-operations

@@ -13,7 +13,7 @@ export const seedUsers = async (users: UserCreateInput[]): Promise<SeedUserResul
         create: {
           email: user.email,
           password: user.password,
-          roles: user.roles,
+          // roles: user.roles,
           profile: user.profile,
         },
         update: {},
