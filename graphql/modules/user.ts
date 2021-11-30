@@ -124,6 +124,7 @@ export const signupMutation = mutationField('signup', {
   args: {
     data: nonNull(arg({ type: 'SignupInput' })),
   },
+  authorize: isAdmin(ctx),
   resolve: async (_root, args, ctx) => {
     const { data } = args;
     const existingUser = await ctx.db.user.findUnique({ where: { email: data.email } });
