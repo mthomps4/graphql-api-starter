@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "target": "es2015",
+    "lib": ["es5", "dom"],
+    "types": ["cypress", "@testing-library/cypress", "node"],
+    "module": "commonjs",
+    "sourceMap": false,
+    "inlineSourceMap": true,
+    "noImplicitAny": false
+  },
+  "include": ["**/*.ts"],
+  "exclude": []
+}
