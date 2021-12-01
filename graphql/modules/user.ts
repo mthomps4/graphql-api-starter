@@ -62,7 +62,8 @@ export const AuthPayload = objectType({
 export const meQuery = queryField('me', {
   type: 'User',
   description: 'Returns the currently logged in user',
-  resolve: (_root, _args, ctx) => ctx.db.user.findUnique({ where: { id: ctx.user.id } }),
+  resolve: (_root, _args, ctx) =>
+    ctx.user ? ctx.db.user.findUnique({ where: { id: ctx.user.id } }) : null,
 });
 
 export const findUsersQuery = queryField('users', {
@@ -124,7 +125,6 @@ export const signupMutation = mutationField('signup', {
   args: {
     data: nonNull(arg({ type: 'SignupInput' })),
   },
-  authorize: (_root, _args, ctx) => isAdmin(ctx),
   resolve: async (_root, args, ctx) => {
     const { data } = args;
     const existingUser = await ctx.db.user.findUnique({ where: { email: data.email } });
@@ -175,7 +175,6 @@ export const createUserMutation = mutationField('createUser', {
     const updatedArgs = {
       data: {
         ...data,
-        roles: { connect: [{ name: 'USER' }] },
         password: hashPassword(data.password),
       },
     };

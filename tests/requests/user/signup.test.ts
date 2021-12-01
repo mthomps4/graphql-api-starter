@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 
 import { graphQLRequest, resetDB, disconnect } from '../../helpers';
 import { UserFactory } from '../../factories/user';
+import { RoleFactory } from '../../factories/role';
 
 const chance = new Chance();
 
@@ -23,7 +24,12 @@ describe('User signup mutation', () => {
         }
       `;
 
-      const user = await UserFactory.create({ email: 'foo@wee.net' });
+      await RoleFactory.create({ name: 'ADMIN' });
+      await RoleFactory.create({ name: 'USER' });
+
+      const user = await UserFactory.create({
+        email: 'foo@wee.net',
+      });
 
       const variables = {
         data: {
@@ -57,6 +63,9 @@ describe('User signup mutation', () => {
         }
       `;
 
+      await RoleFactory.create({ name: 'ADMIN' });
+      await RoleFactory.create({ name: 'USER' });
+
       const variables = {
         data: {
           email: 'hello@wee.net',
@@ -71,7 +80,7 @@ describe('User signup mutation', () => {
 
       expect(errors).toMatchInlineSnapshot(`
         Array [
-          "Variable \\"$data\\" got invalid value { email: \\"hello@wee.net\\", password: \\"fake\\", profile: { create: [Object] }, roles: { set: [Array] } }; Field \\"roles\\" is not defined by type \\"SignupInput\\".",
+          "Variable \\"$data\\" got invalid value { email: \\"hello@wee.net\\", password: \\"fake\\", profile: { create: [Object] }, roles: { connect: [Object] } }; Field \\"roles\\" is not defined by type \\"SignupInput\\".",
         ]
       `);
     });
@@ -89,6 +98,9 @@ describe('User signup mutation', () => {
           }
         }
       `;
+
+      await RoleFactory.create({ name: 'ADMIN' });
+      await RoleFactory.create({ name: 'USER' });
 
       // eslint-disable-next-line
       const { roles, ...attrs } = UserFactory.build();

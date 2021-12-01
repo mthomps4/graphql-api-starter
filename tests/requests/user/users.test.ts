@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 import { graphQLRequest, graphQLRequestAsUser, resetDB, disconnect } from '../../helpers';
 import { UserFactory } from '../../factories/user';
 import { User, UserWhereUniqueInput } from '../../../types';
+import { RoleFactory } from '../../factories/role';
 
 beforeEach(async () => resetDB());
 afterAll(async () => disconnect());
@@ -18,6 +19,8 @@ describe('users query', () => {
         }
       `;
 
+      await RoleFactory.create({ name: 'ADMIN' });
+      await RoleFactory.create({ name: 'USER' });
       const response = await graphQLRequest({ query });
       const errorMessages = response.body.errors.map((e: GraphQLError) => e.message);
 
@@ -39,6 +42,8 @@ describe('users query', () => {
         }
       `;
 
+      await RoleFactory.create({ name: 'ADMIN' });
+      await RoleFactory.create({ name: 'USER' });
       const user = await UserFactory.create();
       const response = await graphQLRequestAsUser(user, { query });
       const errorMessages = response.body.errors.map((e: GraphQLError) => e.message);
@@ -61,6 +66,8 @@ describe('users query', () => {
         }
       `;
 
+      await RoleFactory.create({ name: 'ADMIN' });
+      await RoleFactory.create({ name: 'USER' });
       // create an admin and a regular user
       const user1 = await UserFactory.create({ roles: { connect: { name: 'ADMIN' } } });
       const user2 = await UserFactory.create();
@@ -86,6 +93,8 @@ describe('users query', () => {
         }
       `;
 
+      await RoleFactory.create({ name: 'ADMIN' });
+      await RoleFactory.create({ name: 'USER' });
       // create 2 users
       const user1 = await UserFactory.create();
       const user2 = await UserFactory.create();
@@ -110,6 +119,8 @@ describe('users query', () => {
         }
       `;
 
+      await RoleFactory.create({ name: 'ADMIN' });
+      await RoleFactory.create({ name: 'USER' });
       // create an admin and a regular user
       const user1 = await UserFactory.create({ roles: { connect: { name: 'ADMIN' } } });
       const user2 = await UserFactory.create();

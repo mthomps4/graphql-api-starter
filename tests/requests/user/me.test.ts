@@ -1,5 +1,6 @@
 import { graphQLRequest, graphQLRequestAsUser, resetDB, disconnect } from '../../helpers';
 import { UserFactory } from '../../factories/user';
+import { RoleFactory } from '../../factories/role';
 
 beforeEach(async () => resetDB());
 afterAll(async () => disconnect());
@@ -33,10 +34,15 @@ describe('me query', () => {
         query ME {
           me {
             email
-            roles
+            roles {
+              name
+            }
           }
         }
       `;
+
+      await RoleFactory.create({ name: 'ADMIN' });
+      await RoleFactory.create({ name: 'USER' });
 
       const user = await UserFactory.create({
         email: 'foo@wee.net',
@@ -50,7 +56,9 @@ describe('me query', () => {
             "me": Object {
               "email": "foo@wee.net",
               "roles": Array [
-                "USER",
+                Object {
+                  "name": "USER",
+                },
               ],
             },
           },

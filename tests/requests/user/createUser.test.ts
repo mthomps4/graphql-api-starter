@@ -33,7 +33,6 @@ describe('User createUser mutation', () => {
       };
 
       const response = await graphQLRequestAsUser(user, { query, variables });
-      console.log(response.body);
 
       const errorMessages = response.body.errors.map((e: GraphQLError) => e.message);
 
@@ -45,29 +44,34 @@ describe('User createUser mutation', () => {
     });
   });
 
-  // describe('admin', () => {
-  //   it('allows setting role', async () => {
-  //     const query = `
-  //       mutation CREATEUSER($data: UserCreateInput!) {
-  //         createUser(data: $data) {
-  //           id
-  //           roles
-  //         }
-  //       }
-  //     `;
+  describe('admin', () => {
+    it('allows setting role', async () => {
+      const query = `
+        mutation CREATEUSER($data: UserCreateInput!) {
+          createUser(data: $data) {
+            id
+            roles {
+              name
+            }
+          }
+        }
+      `;
 
-  //     const admin = await UserFactory.create({ roles: { connect: { name: 'ADMIN' } } });
+      await RoleFactory.create({ name: 'ADMIN' });
+      await RoleFactory.create({ name: 'USER' });
 
-  //     const variables: { data: UserCreateInput } = {
-  //       data: { email: 'hello@wee.net', password: 'fake', roles: { where: { name: 'ADMIN' } } },
-  //     };
+      const admin = await UserFactory.create({ roles: { connect: { name: 'ADMIN' } } });
 
-  //     const response = await graphQLRequestAsUser(admin, { query, variables });
-  //     const user = response.body.data.createUser;
+      const variables: { data: UserCreateInput } = {
+        data: { email: 'hello@wee.net', password: 'fake', roles: { connect: [{ name: 'USER' }] } },
+      };
 
-  //     const expectedRoles = [Role.ADMIN];
-  //     expect(user.id).not.toBeNull();
-  //     expect(user.roles).toEqual(expectedRoles);
-  //   });
-  // });
+      const response = await graphQLRequestAsUser(admin, { query, variables });
+      const user = response.body.data.createUser;
+
+      const expectedRoles = [{ name: 'USER' }];
+      expect(user.id).not.toBeNull();
+      expect(user.roles).toEqual(expectedRoles);
+    });
+  });
 });

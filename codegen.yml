@@ -6,7 +6,6 @@ hooks:
     - yarn lint
 generates:
   types.ts:
-    # documents:
     plugins:
       - typescript
       - typescript-operations

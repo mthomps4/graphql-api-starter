@@ -2,6 +2,7 @@ import { GraphQLError } from 'graphql';
 
 import { graphQLRequest, resetDB, disconnect } from '../../helpers';
 import { UserFactory } from '../../factories/user';
+import { RoleFactory } from '../../factories/role';
 
 beforeEach(async () => resetDB());
 afterAll(async () => disconnect());
@@ -19,6 +20,8 @@ describe('login mutation', () => {
 
   describe('invalid email', () => {
     it('returns an Authentication error', async () => {
+      await RoleFactory.create({ name: 'ADMIN' });
+      await RoleFactory.create({ name: 'USER' });
       await UserFactory.create({ email: 'foo@wee.net' });
 
       const variables = { email: 'fake', password: 'fake' };
@@ -35,6 +38,8 @@ describe('login mutation', () => {
 
   describe('invalid password', () => {
     it('returns an Authentication error', async () => {
+      await RoleFactory.create({ name: 'ADMIN' });
+      await RoleFactory.create({ name: 'USER' });
       const user = await UserFactory.create({ email: 'foo@wee.net' });
 
       const variables = { email: user.email, password: 'fake' };
@@ -51,6 +56,8 @@ describe('login mutation', () => {
 
   describe('valid password', () => {
     it('returns the auth payload', async () => {
+      await RoleFactory.create({ name: 'ADMIN' });
+      await RoleFactory.create({ name: 'USER' });
       const password = 'asdf';
 
       const user = await UserFactory.create({
