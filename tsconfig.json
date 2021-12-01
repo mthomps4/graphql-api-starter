@@ -20,5 +20,5 @@
     "rootDir": "."
   },
   "include": [".", "next-env.d.ts", "types.ts", "types.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "cypress"]
+  "exclude": ["node_modules"]
 }

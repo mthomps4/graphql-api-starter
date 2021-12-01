@@ -1,10 +1,4 @@
-const testPathIgnorePatterns = [
-  '<rootDir>/node_modules',
-  'cypress',
-  'factories',
-  'helpers',
-  'tests/e2e',
-];
+const testPathIgnorePatterns = ['<rootDir>/node_modules', 'factories', 'helpers', 'tests/e2e'];
 
 module.exports = {
   preset: 'ts-jest',
