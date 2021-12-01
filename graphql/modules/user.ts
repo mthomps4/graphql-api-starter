@@ -11,7 +11,7 @@ import {
 import { UserInputError } from 'apollo-server-micro';
 
 import { hashPassword, appJwtForUser, comparePasswords } from '../../services/auth';
-import { canAccess, isAdmin } from '../../services/permissions';
+import { isAdmin } from '../../services/permissions';
 
 // User Type
 export const User = objectType({
@@ -28,10 +28,11 @@ export const User = objectType({
       },
     });
 
+    t.string('email');
     // Show email as null for unauthorized users
-    t.string('email', {
-      resolve: (parent, _args, ctx) => (canAccess(parent, ctx) ? parent.email : null),
-    });
+    // t.string('email', {
+    //   resolve: (parent, _args, ctx) => (canAccess(parent, ctx) ? parent.email : null),
+    // });
 
     t.field('profile', {
       type: 'Profile',
