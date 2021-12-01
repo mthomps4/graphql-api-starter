@@ -68,7 +68,7 @@ export const meQuery = queryField('me', {
 
 export const findUsersQuery = queryField('users', {
   type: list('User'),
-  authorize: (_root, _args, ctx) => isAdmin(ctx),
+  // authorize: (_root, _args, ctx) => isAdmin(ctx),
   resolve: async (_root, args, ctx) => {
     return await ctx.db.user.findMany({ ...args });
   },
