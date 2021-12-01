@@ -30,7 +30,7 @@ export const User = objectType({
 
     // Show email as null for unauthorized users
     t.string('email', {
-      resolve: (profile, _args, ctx) => (canAccess(profile, ctx) ? profile.email : null),
+      resolve: (parent, _args, ctx) => (canAccess(parent, ctx) ? parent.email : null),
     });
 
     t.field('profile', {
@@ -62,12 +62,12 @@ export const AuthPayload = objectType({
 export const meQuery = queryField('me', {
   type: 'User',
   description: 'Returns the currently logged in user',
-  resolve: (_root, _args, ctx) => ctx.user,
+  resolve: (_root, _args, ctx) => ctx.db.user.findUnique({ where: { id: ctx.user.id } }),
 });
 
 export const findUsersQuery = queryField('users', {
   type: list('User'),
-  authorize: (_root, _args, ctx) => isAdmin(ctx.user, ctx),
+  authorize: (_root, _args, ctx) => isAdmin(ctx),
   resolve: async (_root, args, ctx) => {
     return await ctx.db.user.findMany({ ...args });
   },
@@ -124,7 +124,7 @@ export const signupMutation = mutationField('signup', {
   args: {
     data: nonNull(arg({ type: 'SignupInput' })),
   },
-  authorize: isAdmin(ctx),
+  authorize: (_root, _args, ctx) => isAdmin(ctx),
   resolve: async (_root, args, ctx) => {
     const { data } = args;
     const existingUser = await ctx.db.user.findUnique({ where: { email: data.email } });
@@ -160,7 +160,7 @@ export const createUserMutation = mutationField('createUser', {
   args: {
     data: nonNull(arg({ type: 'UserCreateInput' })),
   },
-  authorize: (_root, _args, ctx) => isAdmin(ctx.user, ctx),
+  authorize: (_root, _args, ctx) => isAdmin(ctx),
   resolve: async (_root, args, ctx) => {
     const { data } = args;
     const existingUser = await ctx.db.user.findUnique({ where: { email: data.email } });

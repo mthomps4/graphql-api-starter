@@ -1,10 +1,11 @@
 import { IncomingMessage } from 'http';
 
 import { Context as ApolloContext } from 'apollo-server-core';
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 import { prisma } from '../lib/prisma';
 import { verifyAuthHeader } from '../services/auth';
+import { User } from '../types';
 
 /**
  * Populates a context object for use in resolvers.
@@ -16,7 +17,10 @@ export async function createContext(context: ApolloApiContext): Promise<Context>
   let user: User | null = null;
 
   if (authHeader) {
-    user = await prisma.user.findUnique({ where: { id: authHeader.userId } });
+    user = await prisma.user.findUnique({
+      where: { id: authHeader.userId },
+      include: { roles: true },
+    });
   }
 
   return {

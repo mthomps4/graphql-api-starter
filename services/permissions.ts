@@ -1,5 +1,3 @@
-import { Profile } from '@prisma/client';
-
 import { Context } from '../graphql/context';
 import { User } from '../types';
 
@@ -7,8 +5,8 @@ import { User } from '../types';
  * Returns true if the user has a role of admin
  * @param user The user to check the role for
  */
-export const isAdmin = (user: User, ctx: Context): boolean => {
-  return user.roles.some((role) => role.name === 'ADMIN');
+export const isAdmin = (ctx: Context): boolean => {
+  return ctx.user.roles.some((role) => role.name === 'ADMIN');
 };
 
 /**
@@ -29,10 +27,10 @@ export function isSelf(user: Pick<User, 'id'>, ctx: Context): boolean {
  * @param ctx the context which contains the current user
  * @param idField the key in the object to check against
  */
-export function canAccess(object: Profile | User, ctx: Context, idField = 'userId'): boolean {
+export function canAccess(user: Pick<User, 'id'>, ctx: Context): boolean {
   if (!ctx.user) return false;
-  if (isAdmin(ctx.user, ctx)) return true;
-  if (isSelf(object, ctx)) return true;
+  if (isAdmin(ctx)) return true;
+  if (isSelf(user, ctx)) return true;
 
-  return (object as any)[idField] === ctx.user?.id;
+  return false;
 }
