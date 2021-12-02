@@ -18,7 +18,7 @@ export const config = {
   },
 };
 
-export const server = new ApolloServer({
+export const apolloServer = new ApolloServer({
   schema,
   introspection: true,
   context: createContext,
@@ -32,10 +32,26 @@ export const server = new ApolloServer({
   ],
 });
 
-const serverStart = server.start();
+const startServer = apolloServer.start();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  await serverStart;
+  // https://github.com/vercel/next.js/blob/canary/examples/api-routes-graphql/pages/api/graphql.js
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
 
-  return server.createHandler({ path: GRAPHQL_PATH })(req, res);
+  if (req.method === 'OPTIONS') {
+    res.end();
+
+    return false;
+  }
+
+  await startServer;
+  await apolloServer.createHandler({
+    path: '/api/graphql',
+  })(req, res);
 }
